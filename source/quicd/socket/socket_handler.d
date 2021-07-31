@@ -8,16 +8,18 @@ module quicd.socket.socket_handler;
 */
 interface SocketOperations
 {
+
     /**
-    データ送信
-
-    Params:
-        data = 送信データ
-    Returns:
-        送信できたサイズ
+    通信終了
     */
-    size_t send(scope const(void)[] data);
+    void close();
+}
 
+/**
+データ受信時に行える処理
+*/
+interface SocketReceiveOperations : SocketOperations
+{
     /**
     データ受信
 
@@ -27,11 +29,22 @@ interface SocketOperations
         受信できたサイズ
     */
     size_t receive(scope void[] data);
+}
 
+/**
+データ送信時に行える処理
+*/
+interface SocketSendOperations : SocketOperations
+{
     /**
-    通信終了
+    データ送信
+
+    Params:
+        data = 送信データ
+    Returns:
+        送信できたサイズ
     */
-    void close();
+    size_t send(scope const(void)[] data);
 }
 
 /**
@@ -45,7 +58,7 @@ interface ScoketHandler
     Params:
         operations = 行える操作
     */
-    void onReceivable(scope SocketOperations operations);
+    void onReceivable(scope SocketReceiveOperations operations);
 
     /**
     データ送信可能時の処理
@@ -53,6 +66,23 @@ interface ScoketHandler
     Params:
         operations = 行える操作
     */
-    void onSendable(scope SocketOperations operations);
+    void onSendable(scope SocketSendOperations operations);
+
+    /**
+    エラー発生時の処理
+
+    Params:
+        errorMessage = 発生したエラーのメッセージ
+        operations = 行える操作
+    */
+    void onError(string errorMessage, scope SocketOperations operations);
+
+    /**
+    データ送信可能時の処理
+
+    Params:
+        operations = 行える操作
+    */
+    void onIdle(scope SocketOperations operations);
 }
 
