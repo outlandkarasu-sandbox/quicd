@@ -1,0 +1,5 @@
+/**
+quicdルートパッケージ.
+*/
+module quicd;
+
