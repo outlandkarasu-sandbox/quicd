@@ -1,0 +1,8 @@
+{
+	"authors": [
+		"outland.karasu@gmail.com"
+	],
+	"description": "QUIC学習プロジェクト",
+	"license": "BSL-1.0",
+	"name": "quicd"
+}

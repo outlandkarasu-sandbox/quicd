@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/quicd
+quicd.so
+quicd.dylib
+quicd.dll
+quicd.a
+quicd.lib
+quicd-test-*
+*.exe
+*.o
+*.obj
+*.lst
