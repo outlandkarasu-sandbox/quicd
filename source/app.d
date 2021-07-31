@@ -5,5 +5,13 @@ import quicd.client : clientMain;
 
 void main()
 {
-    serverMain();
+    version(QuicdServer)
+    {
+        serverMain();
+    }
+
+    version(QuicdClient)
+    {
+        clientMain();
+    }
 }
