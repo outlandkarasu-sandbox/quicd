@@ -3,6 +3,8 @@
 */
 module quicd.socket.socket_handler;
 
+import std.socket : Address;
+
 /**
 ソケットに対して行える処理
 */
@@ -25,10 +27,11 @@ interface SocketReceiveOperations : SocketOperations
 
     Params:
         data = 受信データ
+        from = 送信元アドレス
     Returns:
         受信できたサイズ
     */
-    size_t receive(scope void[] data);
+    size_t receive(scope void[] data, ref Address from);
 }
 
 /**
@@ -41,10 +44,11 @@ interface SocketSendOperations : SocketOperations
 
     Params:
         data = 送信データ
+        to = 送信先アドレス
     Returns:
         送信できたサイズ
     */
-    size_t send(scope const(void)[] data);
+    size_t send(scope const(void)[] data, Address to);
 }
 
 /**
