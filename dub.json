@@ -9,11 +9,13 @@
 		{
 			"name": "server",
 			"targetType": "executable",
+			"targetName": "quicd-server",
 			"versions": ["QuicdServer"]
 		},
 		{
 			"name": "client",
 			"targetType": "executable",
+			"targetName": "quicd-client",
 			"versions": ["QuicdClient"]
 		}
 	]
