@@ -10,7 +10,6 @@ import std.socket : Address;
 */
 interface SocketOperations
 {
-
     /**
     通信終了
     */
@@ -54,7 +53,7 @@ interface SocketSendOperations : SocketOperations
 /**
 ソケットのイベントハンドラー
 */
-interface ScoketHandler
+interface SocketHandler
 {
     /**
     データ受信可能時の処理

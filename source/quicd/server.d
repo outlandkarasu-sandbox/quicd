@@ -3,14 +3,23 @@
 */
 module quicd.server;
 
+import std.array : Appender;
 import std.stdio : writeln, writefln;
+import std.experimental.logger : errorf, info, infof;
 
 import std.socket :
+    Address,
     AddressFamily,
     InternetAddress,
     Socket,
-    SocketSet,
     UdpSocket;
+
+import quicd.socket :
+    socketLoop,
+    SocketHandler,
+    SocketOperations,
+    SocketSendOperations,
+    SocketReceiveOperations;
 
 /**
 サーバーのメイン関数
@@ -20,39 +29,50 @@ void serverMain()
     auto address = new InternetAddress("127.0.0.1", 8443);
     scope socket = new UdpSocket(AddressFamily.INET);
     socket.bind(address);
+    scope handler = new ServerSocketHandler();
 
-    scope checkRead = new SocketSet(1);
-    scope checkError = new SocketSet(1);
+    socketLoop(socket, handler);
+}
 
-    foreach (socketSet; [checkRead, checkError])
-    {
-        socketSet.reset();
-        socketSet.add(socket);
-    }
+private:
 
-    immutable result = Socket.select(checkRead, null, checkError);
-    if (result < 0)
+class ServerSocketHandler : SocketHandler
+{
+    override void onReceivable(scope SocketReceiveOperations operations)
     {
-        writeln("interrupted.");
-        return;
-    }
-    else if (result == 0)
-    {
-        writeln("timeout");
-        return;
-    }
-
-    if (checkRead.isSet(socket))
-    {
-        char[1024] buffer;
-        immutable received = socket.receive(buffer);
-        if (received == Socket.ERROR)
+        ubyte[1024] data = void;
+        Address address;
+        immutable result = operations.receive(data[], address);
+        if (result == Socket.ERROR)
         {
-            writeln("error");
+            errorf("socket error");
             return;
         }
 
-        writefln("received: %s", buffer[0 .. received]);
+        if (result == 0)
+        {
+            info("close socket");
+            return;
+        }
+
+        infof("receive(%s): %s", address, data[0 .. result]);
+
+        buffer_ ~= data[0 .. result];
     }
+
+    override void onSendable(scope SocketSendOperations operations)
+    {
+    }
+
+    override void onError(string errorMessage, scope SocketOperations operations)
+    {
+        errorf("socket error: %s", errorMessage);
+    }
+
+    override void onIdle(scope SocketOperations operations)
+    {
+    }
+private:
+    Appender!(ubyte[]) buffer_;
 }
 
