@@ -3,6 +3,7 @@
 */
 module quicd.server;
 
+import std.algorithm : copy;
 import std.array : Appender;
 import std.stdio : writeln, writefln;
 import std.experimental.logger : errorf, info, infof;
@@ -36,6 +37,11 @@ void serverMain()
 
 private:
 
+struct ServerClient
+{
+    Appender!(ubyte[]) buffer;
+}
+
 class ServerSocketHandler : SocketHandler
 {
     override void onReceivable(scope SocketReceiveOperations operations)
@@ -57,11 +63,24 @@ class ServerSocketHandler : SocketHandler
 
         infof("receive(%s): %s", address, data[0 .. result]);
 
-        buffer_ ~= data[0 .. result];
+        clients_.require(address, ServerClient.init).buffer ~= data[0 .. result];
     }
 
     override void onSendable(scope SocketSendOperations operations)
     {
+        foreach (e; clients_.byKeyValue)
+        {
+            if (e.value.buffer[].length == 0)
+            {
+                continue;
+            }
+
+            auto buffer = e.value.buffer[];
+            immutable sent = operations.send(buffer, e.key);
+            buffer[0 .. $ - sent].copy(buffer[sent .. $]);
+            e.value.buffer.shrinkTo(buffer.length - sent);
+            break;
+        }
     }
 
     override void onError(string errorMessage, scope SocketOperations operations)
@@ -72,7 +91,8 @@ class ServerSocketHandler : SocketHandler
     override void onIdle(scope SocketOperations operations)
     {
     }
+
 private:
-    Appender!(ubyte[]) buffer_;
+    ServerClient[Address] clients_;
 }
 
