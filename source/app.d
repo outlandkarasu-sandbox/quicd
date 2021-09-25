@@ -1,6 +1,17 @@
 import std.stdio;
 
+import quicd.server : serverMain;
+import quicd.client : clientMain;
+
 void main()
 {
-	writeln("Edit source/app.d to start your project.");
+    version(QuicdServer)
+    {
+        serverMain();
+    }
+
+    version(QuicdClient)
+    {
+        clientMain();
+    }
 }

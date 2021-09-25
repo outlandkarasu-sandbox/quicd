@@ -4,5 +4,19 @@
 	],
 	"description": "QUIC学習プロジェクト",
 	"license": "BSL-1.0",
-	"name": "quicd"
+	"name": "quicd",
+	"configurations": [
+		{
+			"name": "server",
+			"targetType": "executable",
+			"targetName": "quicd-server",
+			"versions": ["QuicdServer"]
+		},
+		{
+			"name": "client",
+			"targetType": "executable",
+			"targetName": "quicd-client",
+			"versions": ["QuicdClient"]
+		}
+	]
 }
